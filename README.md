@@ -22,6 +22,10 @@
 [![Vitest](https://img.shields.io/badge/vitest-00FF74?style=for-the-badge&logo=vitest&logoColor=white)](https://vitest.dev/)&nbsp;
 [![Zod](https://img.shields.io/badge/-Zod-408AFF?style=for-the-badge&logo=zod&logoColor=white)](https://zod.dev/)
 
+# progcompea type
+
+This is a fork of [Monkeytype](https://github.com/monkeytypegame/monkeytype) made for Chilean competitive programmers: the typing trainer of Programación Competitiva UChile, live at [mt.erz.cl](https://mt.erz.cl). All credit for the typing test goes to Monkeytype and its contributors.
+
 # About
 
 Monkeytype is a minimalistic and customizable [typing test](https://www.monkeytype.com). It features many test modes, an account system to save your typing speed history, and user-configurable features such as themes, sounds, a smooth caret, and more. Monkeytype attempts to emulate a natural typing experience during a typing test by unobtrusively presenting the text prompts and displaying typed characters in place, providing straightforward, real-time feedback on typos, speed, and accuracy.
