@@ -29,4 +29,4 @@ Frontend is partially migrated - new components use SolidJS (`.tsx`), legacy cod
 ## Fork conventions
 progcompea type: fork of monkeytypegame/monkeytype (remote `origin`), lives at progcompuch/monkeytype (remote `progcompuch`, branch `main`).
 - Commit subjects end with author GitHub handle: `feat: add x (@handle)`
-- Release notes: progcompea changes (`git log origin/master..HEAD`) in own list, separate from upstream-merged changes, each credited `(@handle)`. See docs/CONTRIBUTING.md#release-notes
+- Release notes: progcompea changes in own list, separate from upstream-merged changes, each credited `(@handle)`. `packages/release/src/buildChangelog.js` does the split. See docs/CONTRIBUTING.md#release-notes

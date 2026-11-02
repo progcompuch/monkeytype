@@ -36,24 +36,68 @@ const lineDelimiter =
 const logDelimiter =
   "thisismylogdelimiterthatwilldefinitelynotappearintheactualcommitmessage";
 
-async function getLog() {
-  function execPromise(command) {
-    return new Promise((resolve, reject) => {
-      exec(command, (err, stdout, _stderr) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(stdout);
-        }
-      });
-    });
-  }
+// upstream Monkeytype, used to tell progcompea commits apart from merged ones
+const UPSTREAM_REMOTE = "origin";
+const UPSTREAM_BRANCH = "master";
+const UPSTREAM = `${UPSTREAM_REMOTE}/${UPSTREAM_BRANCH}`;
 
-  return execPromise(`git describe --tags --abbrev=0 HEAD^`).then((lastTag) =>
-    execPromise(
-      `git log --oneline ${lastTag.trim()}..HEAD --pretty="format:${lineDelimiter}%H${logDelimiter}%h${logDelimiter}%s${logDelimiter}%b"`,
+// usage: node buildChangelog.js [from] [to], defaults to last tag before HEAD..HEAD
+const [fromArg, toArg] = process.argv.slice(2);
+
+function execPromise(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (err, stdout, _stderr) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(stdout);
+      }
+    });
+  });
+}
+
+async function getRange() {
+  const to = toArg ?? "HEAD";
+  const from =
+    fromArg ?? (await execPromise(`git describe --tags --abbrev=0 ${to}^`));
+  return { from: from.trim(), to };
+}
+
+async function getLog({ from, to }) {
+  return execPromise(
+    `git log --oneline ${from}..${to} --pretty="format:${lineDelimiter}%H${logDelimiter}%h${logDelimiter}%ae${logDelimiter}%s${logDelimiter}%b"`,
+  );
+}
+
+// progcompea commits: patch not in upstream (cherry-picks have new hashes)
+// and author never committed upstream, bots excepted
+async function getForkHashes({ from, to }) {
+  await execPromise(`git fetch -q ${UPSTREAM_REMOTE} ${UPSTREAM_BRANCH}`);
+  const upstreamAuthors = new Set(
+    (await execPromise(`git log --format=%ae ${UPSTREAM} | sort -u`)).split(
+      "\n",
     ),
   );
+  const candidates = await execPromise(
+    `git log --cherry-pick --right-only --no-merges --format="%H %ae" ${UPSTREAM}...${to} ^${from}`,
+  );
+  return new Set(
+    candidates
+      .split("\n")
+      .filter((line) => line !== "")
+      .map((line) => line.split(" "))
+      .filter(([, email]) => {
+        if (email.includes("[bot]")) return true;
+        return !upstreamAuthors.has(email);
+      })
+      .map(([hash]) => hash),
+  );
+}
+
+function getGithubHandle(email) {
+  if (email.includes("[bot]")) return undefined;
+  const match = email.match(/^(?:\d+\+)?([^@]+)@users\.noreply\.github\.com$/);
+  return match ? `@${match[1]}` : undefined;
 }
 
 function itemIsAddingQuotes(item) {
@@ -119,8 +163,8 @@ function buildItems(items, mergeTypeAndScope = false) {
   return ret;
 }
 
-function buildSection(type, allItems) {
-  let ret = `### ${titles[type]}\n\n`;
+function buildSection(type, allItems, label) {
+  let ret = `### ${label} ${titles[type].toLowerCase()}\n\n`;
 
   const items = allItems.filter(
     (item) => item.type === type && !item.body.includes("!nuf"),
@@ -133,9 +177,8 @@ function buildSection(type, allItems) {
   return (ret += buildItems(items));
 }
 
-function buildFooter(logs) {
-  let out =
-    "\n### Nerd stuff\n\nThese changes will not be visible to users, but are included for completeness and to credit contributors.\n\n";
+function buildFooter(logs, label) {
+  let out = `\n### ${label} nerd stuff\n\nThese changes will not be visible to users, but are included for completeness and to credit contributors.\n\n`;
 
   const featLogs = logs.filter(
     (item) => item.type === "feat" && item.body.includes("!nuf"),
@@ -176,6 +219,10 @@ function buildFooter(logs) {
   );
 
   // console.log(uniqueOtherLogs);
+
+  if (uniqueOtherLogs.length === 0) {
+    return "";
+  }
 
   out += buildItems(uniqueOtherLogs, true);
 
@@ -240,7 +287,7 @@ function convertStringToLog(logString) {
     //   /(\w{40}) (\w{9,10}) (.*)/
     // );
 
-    const [hash, shortHash, title, body] = line
+    const [hash, shortHash, email, title, body] = line
       .split(logDelimiter)
       .map((s) => s.trim());
 
@@ -268,6 +315,7 @@ function convertStringToLog(logString) {
             full: hash,
           },
         ],
+        email,
         type,
         scope,
         message,
@@ -287,7 +335,8 @@ const header =
   "Thank you to all the contributors who made this release possible!";
 
 async function main() {
-  let logString = await getLog();
+  const range = await getRange();
+  let logString = await getLog(range);
   logString = logString.split(lineDelimiter);
 
   //test commits
@@ -326,7 +375,19 @@ async function main() {
   //   "d2739e4f193137db4d86450f0d50b3489d75c104 d2739e4f1 test(blah): add new test blah (#1234)",
   // ];
 
-  let log = convertStringToLog(logString);
+  // release commits only show up when regenerating notes for an existing tag
+  let log = convertStringToLog(logString).filter(
+    (item) => !(item.type === "chore" && item.message.startsWith("release v")),
+  );
+
+  const forkHashes = await getForkHashes(range);
+  for (const item of log) {
+    item.isFork = forkHashes.has(item.hashes[0].full);
+    const handle = getGithubHandle(item.email);
+    if (item.isFork && item.usernames.length === 0 && handle !== undefined) {
+      item.usernames = [handle];
+    }
+  }
 
   const contributorCount = log.flatMap((l) => {
     const filtered = l.usernames.filter((u) => {
@@ -340,6 +401,30 @@ async function main() {
     return filtered;
   }).length;
 
+  let final = "";
+
+  if (contributorCount > 0) {
+    final += `${header}\n\n\n`;
+  }
+
+  // progcompea changes and changes merged from Monkeytype get separate lists
+  final += [
+    buildNotes(
+      log.filter((item) => item.isFork),
+      "progcompea",
+    ),
+    buildNotes(
+      log.filter((item) => !item.isFork),
+      "Monkeytype",
+    ),
+  ]
+    .filter((notes) => notes !== "")
+    .join("\n\n\n");
+
+  console.log(final);
+}
+
+function buildNotes(log, label) {
   let quoteAddCommits = log.filter((item) => itemIsAddingQuotes(item));
   log = log.filter((item) => !itemIsAddingQuotes(item));
 
@@ -374,13 +459,9 @@ async function main() {
 
   let final = "";
 
-  if (contributorCount > 0) {
-    final += `${header}\n\n\n`;
-  }
-
   const sections = [];
   for (const type of Object.keys(titles)) {
-    const section = buildSection(type, log);
+    const section = buildSection(type, log, label);
     if (section) {
       sections.push(section);
     }
@@ -388,12 +469,12 @@ async function main() {
 
   final += sections.join("\n\n");
 
-  const footer = buildFooter(log);
+  const footer = buildFooter(log, label);
   if (footer) {
     final += `\n${footer}`;
   }
 
-  console.log(final);
+  return final.trim();
 }
 
 main();

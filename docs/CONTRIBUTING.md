@@ -61,6 +61,8 @@ This site is a fork of [Monkeytype](https://github.com/monkeytypegame/monkeytype
 - Changes merged from Monkeytype go in a separate list.
 - Every change credits its author the same way Monkeytype does, with their GitHub handle in parentheses: `- add handbook-usm language (@svandich)`.
 
+`packages/release/src/buildChangelog.js` builds the notes this way (`node packages/release/src/buildChangelog.js [from] [to]`, defaults to the last tag up to `HEAD`). It needs a remote `origin` pointing to monkeytypegame/monkeytype. A commit counts as a progcompea change when its patch is not in Monkeytype's `master` and its author has never committed to Monkeytype. Upstream commits cherry-picked into this repo get new hashes, so `git log origin/master..HEAD` alone is not enough. progcompea commits without a handle in the subject are credited from the author's GitHub noreply email.
+
 ### Theme Guidelines
 
 <!-- TODO: add screenshots to provide examples for dos and don'ts -->

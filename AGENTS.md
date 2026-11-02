@@ -8,4 +8,4 @@ In legacy code, use `i` tags with FontAwesome classes. In new code, use `Fa` com
 In plan mode, before writing up a plan, ask clarifying questions if needed. At the end of plan mode, give me a list of unresolved questions to answer, if any. Make them concise.
 This is progcompea type: fork of monkeytypegame/monkeytype (remote `origin`, branch `master`), lives at progcompuch/monkeytype (remote `progcompuch`, branch `main`).
 Commit subjects end with author GitHub handle, like upstream: `feat: add x (@handle)`.
-Release notes: progcompea changes (commits in `git log origin/master..HEAD`) go in their own list, separate from upstream-merged changes, each credited `(@handle)` like upstream. See docs/CONTRIBUTING.md#release-notes.
+Release notes: progcompea changes go in their own list, separate from upstream-merged changes, each credited `(@handle)` like upstream. `packages/release/src/buildChangelog.js` does this (progcompea = patch not in `origin/master` and author never committed upstream; cherry-picks get new hashes so `origin/master..HEAD` alone is wrong). See docs/CONTRIBUTING.md#release-notes.
