@@ -181,7 +181,7 @@ async function fetchVersionHistory(options: { pageParam: number }): Promise<{
 
     let body = release.body;
 
-    body = body.replace(/\r\n/g, "<br>");
+    body = body.replace(/\r?\n/g, "<br>");
     //replace ### title with h3 title h3
     body = body.replace(
       /### (.*?)<br>/g,
