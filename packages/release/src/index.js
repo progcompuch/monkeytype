@@ -24,7 +24,7 @@ const PROJECT_ROOT = path.resolve(DIRNAME, "../../../");
 const OWNER = "progcompuch";
 const REPO = "monkeytype";
 const BRANCH = "main";
-const REMOTE = "svandich";
+const REMOTE = "progcompuch";
 
 const runCommand = (command, force) => {
   if (isDryRun && !force) {
