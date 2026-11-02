@@ -1,4 +1,4 @@
-[![](https://github.com/monkeytypegame/monkeytype/blob/master/frontend/static/images/githubbanner2.png?raw=true)](https://monkeytype.com/)
+[![](https://github.com/progcompuch/monkeytype/blob/main/frontend/static/images/githubbanner2.png?raw=true)](https://monkeytype.com/)
 <br />
 
 [![AnimeJs](https://img.shields.io/badge/Anime.js-ff4b4b?style=for-the-badge&logo=animedotjs&logoColor=white)](https://animejs.com/)&nbsp;
@@ -45,7 +45,7 @@ On the [Monkeytype Discord server](https://www.discord.gg/monkeytype), we added 
 
 # Bug report or Feature request
 
-If you encounter a bug or have a feature request, [send us an email](mailto:contact@monkeytype.com), [create an issue](https://github.com/monkeytypegame/monkeytype/issues), [create a discussion thread](https://github.com/monkeytypegame/monkeytype/discussions), or [join the Discord server](https://www.discord.gg/monkeytype).
+If you encounter a bug or have a feature request, [send us an email](mailto:contact@monkeytype.com), [create an issue](https://github.com/progcompuch/monkeytype/issues), or [join the Discord server](https://www.discord.gg/monkeytype).
 
 # Want to Contribute?
 
@@ -65,7 +65,7 @@ To report a security vulnerability, please refer to [SECURITY.md](./docs/SECURIT
 
 Everyone who provided valuable feedback on the [original Reddit post](https://www.reddit.com/r/MechanicalKeyboards/comments/gc6wx3/experimenting_with_a_completely_new_type_of/) for the prototype of this website.
 
-All of the [contributors](https://github.com/monkeytypegame/monkeytype/graphs/contributors) have helped implement various features, add themes, fix bugs, and more.
+All of the [contributors](https://github.com/progcompuch/monkeytype/graphs/contributors) have helped implement various features, add themes, fix bugs, and more.
 
 # Support
 

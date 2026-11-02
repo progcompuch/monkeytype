@@ -32,8 +32,8 @@ export function ContactModal(): JSXElement {
         />
         <Button
           variant="button"
-          href="https://github.com/monkeytypegame/monkeytype"
-          text="Monkeytype (the original)"
+          href="https://github.com/progcompuch/monkeytype"
+          text="source code"
           class={buttonClass}
           fa={{
             icon: "fa-code",

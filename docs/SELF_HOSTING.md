@@ -29,9 +29,9 @@
 ## Quickstart
 
 - create a new directory (e.g. `monkeytype`) and navigate into it.
-- download the [docker-compose.yml](https://github.com/monkeytypegame/monkeytype/tree/master/docker/docker-compose.yml) file.
-- create an `.env` file, you can copy the content from the [example.env](https://github.com/monkeytypegame/monkeytype/tree/master/docker/example.env).
-- download the [backend-configuration.json](https://github.com/monkeytypegame/monkeytype/tree/master/docker/backend-configuration.json)
+- download the [docker-compose.yml](https://github.com/progcompuch/monkeytype/tree/main/docker/docker-compose.yml) file.
+- create an `.env` file, you can copy the content from the [example.env](https://github.com/progcompuch/monkeytype/tree/main/docker/example.env).
+- download the [backend-configuration.json](https://github.com/progcompuch/monkeytype/tree/main/docker/backend-configuration.json)
 - run `docker compose up -d`
 - after the command exits successfully you can access [http://localhost](http://localhost)
 
@@ -165,11 +165,11 @@ To enable daily leaderboards update the `backend-configuration.json` file and ad
 
 ### env file
 
-All settings are described in the [example.env](https://github.com/monkeytypegame/monkeytype/tree/master/docker/example.env) file.
+All settings are described in the [example.env](https://github.com/progcompuch/monkeytype/tree/main/docker/example.env) file.
 
 ### backend-configuration.json
 
-Configuration of the backend. Check the [default configuration](https://github.com/monkeytypegame/monkeytype/blob/master/backend/src/constants/base-configuration.ts#L8) for possible values.
+Configuration of the backend. Check the [default configuration](https://github.com/progcompuch/monkeytype/blob/main/backend/src/constants/base-configuration.ts#L8) for possible values.
 
 > [!NOTE]
 > Configuration changes are applied only on container startup. You must restart the container for your updates to take effect.

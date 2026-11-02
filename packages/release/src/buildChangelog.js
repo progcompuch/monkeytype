@@ -92,7 +92,7 @@ function getPrLink(pr) {
 }
 
 function getCommitLink(hash, longHash) {
-  return `[${hash}](https://github.com/monkeytypegame/monkeytype/commit/${longHash})`;
+  return `[${hash}](https://github.com/progcompuch/monkeytype/commit/${longHash})`;
 }
 
 function buildItems(items, mergeTypeAndScope = false) {

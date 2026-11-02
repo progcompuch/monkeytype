@@ -46,12 +46,12 @@ export function Footer(): JSXElement {
           />
           <Button
             variant="text"
-            text="built on monkeytype"
+            text="source code"
             fa={{
               icon: "fa-code",
               fixedWidth: true,
             }}
-            href="https://github.com/monkeytypegame/monkeytype"
+            href="https://github.com/progcompuch/monkeytype"
           />
           <Button
             variant="text"

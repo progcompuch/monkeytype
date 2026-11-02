@@ -323,6 +323,13 @@ export function AboutPage(): JSXElement {
               onClick={() => showModal("Support")}
               class="p-0"
             />
+            . The source code of this site is available on{" "}
+            <Button
+              variant="text"
+              text="GitHub"
+              href="https://github.com/progcompuch/monkeytype"
+              class="p-0"
+            />
             .
           </p>
         </section>

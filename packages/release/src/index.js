@@ -21,6 +21,11 @@ const hotfix = args.has("--hotfix");
 
 const PROJECT_ROOT = path.resolve(DIRNAME, "../../../");
 
+const OWNER = "progcompuch";
+const REPO = "monkeytype";
+const BRANCH = "main";
+const REMOTE = "svandich";
+
 const runCommand = (command, force) => {
   if (isDryRun && !force) {
     console.log(`[Dry Run] Command: ${command}`);
@@ -62,32 +67,34 @@ const checkBranchSync = () => {
     console.log("Skipping sync check.");
     return;
   }
-  console.log("Checking if local branch is master...");
+  console.log(`Checking if local branch is ${BRANCH}...`);
   const currentBranch = runProjectRootCommand(
     "git branch --show-current",
   ).trim();
-  if (currentBranch !== "master" && !isDryRun) {
+  if (currentBranch !== BRANCH && !isDryRun) {
     console.error(
-      "Local branch is not master. Please checkout the master branch.",
+      `Local branch is not ${BRANCH}. Please checkout the ${BRANCH} branch.`,
     );
     process.exit(1);
   }
 
-  console.log("Checking if local master branch is in sync with origin...");
+  console.log(
+    `Checking if local ${BRANCH} branch is in sync with ${REMOTE}...`,
+  );
 
   try {
     // Fetch the latest changes from the remote repository
-    runProjectRootCommand("git fetch origin");
+    runProjectRootCommand(`git fetch ${REMOTE}`);
 
-    // Get the commit hashes of the local and remote master branches
-    const localMaster = runProjectRootCommand("git rev-parse master").trim();
+    // Get the commit hashes of the local and remote branches
+    const localMaster = runProjectRootCommand(`git rev-parse ${BRANCH}`).trim();
     const remoteMaster = runProjectRootCommand(
-      "git rev-parse origin/master",
+      `git rev-parse ${REMOTE}/${BRANCH}`,
     ).trim();
 
     if (localMaster !== remoteMaster && !isDryRun) {
       console.error(
-        "Local master branch is not in sync with origin. Please pull the latest changes before proceeding.",
+        `Local ${BRANCH} branch is not in sync with ${REMOTE}. Please pull the latest changes before proceeding.`,
       );
       process.exit(1);
     }
@@ -243,7 +250,7 @@ const createCommitAndTag = (version) => {
   runCommand(`git add .`);
   runCommand(`git commit -m "chore: release ${version}"`);
   runCommand(`git tag ${version}`);
-  runCommand(`git push origin master --tags --no-verify`);
+  runCommand(`git push ${REMOTE} ${BRANCH} --tags --no-verify`);
 };
 
 const createGithubRelease = async (version, changelogContent) => {
@@ -254,13 +261,9 @@ const createGithubRelease = async (version, changelogContent) => {
     );
   } else {
     const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
-    const { owner, repo } = {
-      owner: "monkeytypegame",
-      repo: "monkeytype",
-    };
     await octokit.repos.createRelease({
-      owner,
-      repo,
+      owner: OWNER,
+      repo: REPO,
       tag_name: version,
       name: `${version}`,
       body: changelogContent,
