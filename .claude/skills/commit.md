@@ -12,7 +12,7 @@ Trigger: user asks to commit, or uses /commit
    - If no changes at all, tell the user "Nothing to commit." and stop.
 2. Run `git diff --cached` to see the full diff of what will be committed.
 3. Write a conventional commit message:
-   - Format: `<type>: <description>`
+   - Format: `<type>: <description> (@handle)`, where `@handle` is the author's GitHub handle (from `git config user.email` noreply address, else ask)
    - Types: `feat`, `fix`, `refactor`, `style`, `chore`, `docs`, `test`, `perf`
    - Description: lowercase, imperative mood, no period, concise
    - Pick the type that best fits the change. Use `feat` for new features, `fix` for bug fixes, `refactor` for code restructuring, `style` for visual/CSS-only changes, `chore` for maintenance/tooling.

@@ -5,6 +5,7 @@
 - [Getting Started](#getting-started)
 - [How to Contribute](#how-to-contribute)
 - [Standards and Guidelines](#standards-and-guidelines)
+  - [Release Notes](#release-notes)
   - [Theme Guidelines](#theme-guidelines)
   - [Language Guidelines](#language-guidelines)
   - [Quote Guidelines](#quote-guidelines)
@@ -49,6 +50,16 @@ For types, we use the following:
 - `feat: add new feature (@github_username)`
 - `impr(quotes): add english quotes (@username)`
 - `fix(leaderboard): show user rank correctly (@user1, @user2, @user3)`
+
+Commits on `main` follow the same format, including the author's GitHub handle at the end.
+
+### Release Notes
+
+This site is a fork of [Monkeytype](https://github.com/monkeytypegame/monkeytype), so a release contains both progcompea changes and changes merged from Monkeytype. Release notes keep them apart:
+
+- progcompea changes (commits not in Monkeytype's `master`, i.e. `git log origin/master..HEAD` with `origin` pointing to monkeytypegame/monkeytype) go in their own list.
+- Changes merged from Monkeytype go in a separate list.
+- Every change credits its author the same way Monkeytype does, with their GitHub handle in parentheses: `- add handbook-usm language (@svandich)`.
 
 ### Theme Guidelines
 

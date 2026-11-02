@@ -25,3 +25,8 @@ Frontend is partially migrated - new components use SolidJS (`.tsx`), legacy cod
 - `frontend/src/ts/config-metadata.ts`: Config validation rules
 - `packages/contracts/src/index.ts`: API contract structure
 - `backend/src/api/routes/index.ts`: ts-rest setup
+
+## Fork conventions
+progcompea type: fork of monkeytypegame/monkeytype (remote `origin`), lives at progcompuch/monkeytype (remote `progcompuch`, branch `main`).
+- Commit subjects end with author GitHub handle: `feat: add x (@handle)`
+- Release notes: progcompea changes (`git log origin/master..HEAD`) in own list, separate from upstream-merged changes, each credited `(@handle)`. See docs/CONTRIBUTING.md#release-notes
