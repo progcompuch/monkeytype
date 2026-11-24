@@ -252,6 +252,30 @@ describe("QuoteLeaderboardsDal", () => {
       });
     });
   });
+
+  describe("getUserQuoteBestWpm", () => {
+    it("should get the best wpm on the quote", async () => {
+      //GIVEN
+      const user = await eligibleUser();
+      const other = await eligibleUser();
+      await addResults(user, "1", [80, 120, 100]);
+      //other users, quotes, languages, modes, bailed out and lazy mode results are ignored
+      await addResults(other, "1", [200]);
+      await addResults(user, "2", [200]);
+      await addResults(user, "1", [200], { language: "english" });
+      await addResults(user, "1", [200], { mode: "words" });
+      await addResults(user, "1", [200], { bailedOut: true });
+      await addResults(user, "1", [200], { lazyMode: true });
+
+      //WHEN / THEN
+      await expect(
+        QuoteLeaderboardsDal.getUserQuoteBestWpm(user.uid, "ariasctl", "1"),
+      ).resolves.toEqual(120);
+      await expect(
+        QuoteLeaderboardsDal.getUserQuoteBestWpm(user.uid, "ariasctl", "3"),
+      ).resolves.toBeUndefined();
+    });
+  });
 });
 
 async function eligibleUser(

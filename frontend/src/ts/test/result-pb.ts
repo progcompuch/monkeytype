@@ -16,7 +16,8 @@ export type PbEligibility = {
 };
 
 /**
- * null when pbs don't apply at all (quote mode or the result isn't saved)
+ * null when local pbs don't apply at all (quote mode, its pbs come from the
+ * server response, or the result isn't saved)
  */
 export function getPbEligibility(
   result: CompletedResult,

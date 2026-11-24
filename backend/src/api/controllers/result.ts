@@ -28,6 +28,7 @@ import {
   purgeUserFromDailyLeaderboards,
 } from "../../utils/daily-leaderboards";
 import * as UserDAL from "../../dal/user";
+import * as QuoteLeaderboardsDAL from "../../dal/quote-leaderboards";
 import { buildMonkeyMail } from "../../utils/monkey-mail";
 import * as WeeklyXpLeaderboard from "../../services/weekly-xp-leaderboard";
 import { UAParser } from "ua-parser-js";
@@ -440,12 +441,27 @@ export async function addResult(
 
   let isPb = false;
   let tagPbs: string[] = [];
+  let quotePbDiff: number | undefined;
 
   if (!completedEvent.bailedOut) {
     [isPb, tagPbs] = await Promise.all([
       UserDAL.checkIfPb(uid, user, completedEvent),
       UserDAL.checkIfTagPb(uid, user, completedEvent),
     ]);
+
+    // quote pbs are not stored, compare against the best result on the quote
+    // (before this one is saved). The first result on a quote is not a pb.
+    if (completedEvent.mode === "quote" && !completedEvent.lazyMode) {
+      const previousBest = await QuoteLeaderboardsDAL.getUserQuoteBestWpm(
+        uid,
+        completedEvent.language,
+        completedEvent.mode2,
+      );
+      if (previousBest !== undefined && completedEvent.wpm > previousBest) {
+        isPb = true;
+        quotePbDiff = roundTo2(completedEvent.wpm - previousBest);
+      }
+    }
   }
 
   if (completedEvent.mode === "time" && completedEvent.mode2 === "60") {
@@ -667,6 +683,10 @@ export async function addResult(
 
   if (weeklyXpLeaderboardRank !== -1) {
     data.weeklyXpLeaderboardRank = weeklyXpLeaderboardRank;
+  }
+
+  if (quotePbDiff !== undefined) {
+    data.quotePbDiff = quotePbDiff;
   }
 
   incrementResult(completedEvent, dbresult.isPb);

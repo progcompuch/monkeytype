@@ -102,9 +102,11 @@ import {
   resultState,
   setResultState,
   setCrownType,
+  showCrown,
 } from "../states/result";
 import { blurInputElement, setInputElementValue } from "../input/input-element";
 import { qs } from "../utils/dom";
+import Format from "../singletons/format";
 import { setAccountButtonSpinner } from "../states/header";
 import { Config } from "../config/store";
 import { setQuoteLengthAll, setConfig } from "../config/setters";
@@ -1140,7 +1142,16 @@ async function saveResult(
     localDataToSave.result = snapshotResult;
   }
 
-  if (data.isPb !== undefined && data.isPb) {
+  if (data.isPb && result.mode === "quote") {
+    // quote pbs are not stored locally, the server compares against the previous best on the quote
+    showConfetti();
+    showCrown(
+      "normal",
+      data.quotePbDiff !== undefined
+        ? `+${Format.typingSpeed(data.quotePbDiff, { showDecimalPlaces: true })}`
+        : "",
+    );
+  } else if (data.isPb !== undefined && data.isPb) {
     //new pb
     const localPb = DB.getLocalPB(
       result.mode,

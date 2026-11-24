@@ -170,6 +170,8 @@ export const PostResultResponseSchema = z.object({
   tagPbs: z.array(IdSchema),
   dailyLeaderboardRank: z.number().int().nonnegative().optional(),
   weeklyXpLeaderboardRank: z.number().int().nonnegative().optional(),
+  /** wpm gained over the previous best on the quote, set on a new quote pb */
+  quotePbDiff: z.number().nonnegative().optional(),
   xp: z.number().int().nonnegative(),
   dailyXpBonus: z.boolean(),
   xpBreakdown: XpBreakdownSchema,

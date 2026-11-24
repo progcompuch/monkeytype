@@ -5,6 +5,7 @@ import * as ResultDal from "../../../src/dal/result";
 import * as UserDal from "../../../src/dal/user";
 import * as PublicDal from "../../../src/dal/public";
 import * as LogsDal from "../../../src/dal/logs";
+import * as QuoteLeaderboardsDal from "../../../src/dal/quote-leaderboards";
 import { ObjectId } from "mongodb";
 import { mockAuthenticateWithApeKey } from "../../__testData__/auth";
 import { enableRateLimitExpects } from "../../__testData__/rate-limit";
@@ -658,6 +659,81 @@ describe("result controller test", () => {
         4,
         15.1 + 2 - 5, //duration + incompleteTestSeconds-afk
       );
+    });
+    describe("quote pb", () => {
+      const quoteBestMock = vi.spyOn(
+        QuoteLeaderboardsDal,
+        "getUserQuoteBestWpm",
+      );
+
+      beforeEach(() => {
+        quoteBestMock.mockClear();
+        //checkIfPb never returns true for quotes
+        userCheckIfPbMock.mockResolvedValue(false);
+      });
+
+      const addQuoteResult = async (
+        result?: Partial<CompletedEvent>,
+      ): Promise<any> => {
+        const { body } = await mockApp
+          .post("/results")
+          .set("Authorization", `Bearer ${uid}`)
+          .send({
+            result: buildCompletedEvent({
+              mode: "quote",
+              mode2: "7",
+              language: "ariasctl",
+              ...result,
+            }),
+          })
+          .expect(200);
+        return body.data;
+      };
+
+      it("should be a pb when beating the previous best on the quote", async () => {
+        quoteBestMock.mockResolvedValue(70.5);
+
+        const data = await addQuoteResult();
+
+        expect(quoteBestMock).toHaveBeenCalledWith(uid, "ariasctl", "7");
+        expect(data.isPb).toEqual(true);
+        expect(data.quotePbDiff).toEqual(9.5);
+        expect(resultAddMock).toHaveBeenCalledWith(
+          uid,
+          expect.objectContaining({ isPb: true }),
+        );
+      });
+
+      it("should not be a pb when not beating the previous best", async () => {
+        quoteBestMock.mockResolvedValue(80);
+
+        const data = await addQuoteResult();
+
+        expect(data.isPb).toEqual(false);
+        expect(data.quotePbDiff).toBeUndefined();
+      });
+
+      it("should not be a pb on the first result on the quote", async () => {
+        quoteBestMock.mockResolvedValue(undefined);
+
+        const data = await addQuoteResult();
+
+        expect(data.isPb).toEqual(false);
+      });
+
+      it("should not be a pb in lazy mode or bailed out", async () => {
+        quoteBestMock.mockResolvedValue(10);
+
+        expect((await addQuoteResult({ lazyMode: true })).isPb).toEqual(false);
+        expect((await addQuoteResult({ bailedOut: true })).isPb).toEqual(false);
+        expect(quoteBestMock).not.toHaveBeenCalled();
+      });
+
+      it("should not check quote bests on other modes", async () => {
+        await addQuoteResult({ mode: "time", mode2: "15" });
+
+        expect(quoteBestMock).not.toHaveBeenCalled();
+      });
     });
     it("should fail if result saving is disabled", async () => {
       //GIVEN

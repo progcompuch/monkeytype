@@ -6,6 +6,7 @@ import {
   QuoteLeaderboardEntry,
 } from "@monkeytype/schemas/leaderboards";
 import { roundTo2 } from "@monkeytype/util/numbers";
+import { Language } from "@monkeytype/schemas/languages";
 import { getCachedConfiguration } from "../init/configuration";
 import { isDevEnvironment } from "../utils/misc";
 import { getResultCollection } from "./result";
@@ -281,6 +282,34 @@ export async function getUserBests(
     ...best,
     quoteId: parseInt(_id.quote, 10),
   }));
+}
+
+/**
+ * The user's best wpm on a quote, with the same rules as the quote
+ * leaderboards. Undefined if the user has no counting result on it.
+ */
+export async function getUserQuoteBestWpm(
+  uid: string,
+  language: Language,
+  quoteId: string,
+): Promise<number | undefined> {
+  const best = await getResultCollection()
+    .find(
+      {
+        uid,
+        mode: "quote",
+        language,
+        mode2: quoteId,
+        bailedOut: { $ne: true },
+        lazyMode: { $ne: true },
+      },
+      { projection: { _id: 0, wpm: 1 } },
+    )
+    .sort({ wpm: -1 })
+    .limit(1)
+    .next();
+
+  return best?.wpm;
 }
 
 export async function createIndicies(): Promise<void> {
